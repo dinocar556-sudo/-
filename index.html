@@ -137,6 +137,7 @@
                     <th class="p-4 font-semibold text-center w-16">번호</th>
                     <th class="p-4 font-semibold w-24">이름</th>
                     <th class="p-4 font-semibold">지원 학교 및 유형</th>
+                    <th class="p-4 font-semibold text-center hidden sm:table-cell">원서 접수 기간</th>
                     <th class="p-4 font-semibold text-center w-28">접수 상태</th>
                     <th class="p-4 font-semibold text-center w-16">관리</th>
                   </tr>
@@ -165,7 +166,7 @@
   </div>
 
   <!-- ==========================================
-       자바스크립트 로직 (Vanilla JS - LocalStorage)
+       자바스크립트 로직 (Vanilla JS - LocalStorage 개인용)
        ========================================== -->
   <script>
     // --- 상수 및 데이터 정의 ---
@@ -185,8 +186,8 @@
     ];
 
     // --- 상태 변수 (LocalStorage 연동) ---
-    // 로컬 스토리지에서 데이터를 불러옵니다. 없으면 빈 배열[]로 시작합니다.
-    let students = JSON.parse(localStorage.getItem('hwamyeong_local_data')) || [];
+    // 새로운 데이터 키를 사용하여 이전 '반' 정보가 있는 데이터와 충돌을 방지합니다.
+    let allStudents = JSON.parse(localStorage.getItem('hwamyeong_local_data_v4')) || [];
     let deleteTarget = { studentId: null, appId: null };
 
     // --- 초기화 ---
@@ -197,7 +198,6 @@
 
     // 정적 데이터 UI 그리기 (일정표, 학군 목록, Select 태그)
     function renderStaticData() {
-      // 1. 일정표 렌더링
       const scheduleContainer = document.getElementById('schedule-list');
       scheduleContainer.innerHTML = SCHEDULE_DATA.map(item => `
         <div class="p-3 bg-slate-50 rounded-lg text-sm border border-slate-100">
@@ -206,20 +206,18 @@
         </div>
       `).join('');
 
-      // 2. 북부 학군 렌더링
       const schoolContainer = document.getElementById('school-list');
       schoolContainer.innerHTML = BUKBU_SCHOOLS.map(school => `
         <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium border border-emerald-200">${school}</span>
       `).join('');
 
-      // 3. 셀렉트 박스 렌더링
       const selectBox = document.getElementById('form-type');
       selectBox.innerHTML = SCHEDULE_DATA.map(item => `<option value="${item.id}">${item.type}</option>`).join('');
     }
 
     // 데이터를 저장소에 영구 기록하고 화면 갱신
     function saveDataAndRender() {
-      localStorage.setItem('hwamyeong_local_data', JSON.stringify(students));
+      localStorage.setItem('hwamyeong_local_data_v4', JSON.stringify(allStudents));
       renderStudents();
     }
 
@@ -241,15 +239,16 @@
         status: 'pending'
       };
 
-      const existingIdx = students.findIndex(s => s.num === num);
+      // 동일 번호 학생 찾기
+      const existingIdx = allStudents.findIndex(s => s.num === num);
       
       if (existingIdx > -1) {
         // 기존 학생 번호가 있으면 이름 업데이트 및 지원학교 추가(병합)
-        students[existingIdx].name = name;
-        students[existingIdx].applications.push(newApp);
+        allStudents[existingIdx].name = name;
+        allStudents[existingIdx].applications.push(newApp);
       } else {
         // 새 학생 객체 생성
-        students.push({
+        allStudents.push({
           id: 's' + Date.now().toString(),
           num: num,
           name: name,
@@ -267,14 +266,14 @@
 
     // 접수 상태 변경
     function toggleStatus(studentId, appIdToToggle) {
-      const studentIdx = students.findIndex(s => s.id === studentId);
+      const studentIdx = allStudents.findIndex(s => s.id === studentId);
       if (studentIdx === -1) return;
       
-      const appIdx = students[studentIdx].applications.findIndex(a => a.id === appIdToToggle);
+      const appIdx = allStudents[studentIdx].applications.findIndex(a => a.id === appIdToToggle);
       if (appIdx === -1) return;
 
-      const currentStatus = students[studentIdx].applications[appIdx].status;
-      students[studentIdx].applications[appIdx].status = currentStatus === 'pending' ? 'completed' : 'pending';
+      const currentStatus = allStudents[studentIdx].applications[appIdx].status;
+      allStudents[studentIdx].applications[appIdx].status = currentStatus === 'pending' ? 'completed' : 'pending';
       
       saveDataAndRender();
     }
@@ -294,15 +293,15 @@
     // 삭제 확정
     function confirmDelete() {
       const { studentId, appId } = deleteTarget;
-      const studentIdx = students.findIndex(s => s.id === studentId);
+      const studentIdx = allStudents.findIndex(s => s.id === studentId);
       if (studentIdx === -1) return;
 
       // 해당 지원 내역만 삭제
-      students[studentIdx].applications = students[studentIdx].applications.filter(a => a.id !== appId);
+      allStudents[studentIdx].applications = allStudents[studentIdx].applications.filter(a => a.id !== appId);
       
       // 만약 지원 내역이 0개가 되면 학생 데이터 자체를 날림
-      if (students[studentIdx].applications.length === 0) {
-        students.splice(studentIdx, 1);
+      if (allStudents[studentIdx].applications.length === 0) {
+        allStudents.splice(studentIdx, 1);
       }
 
       closeModal();
@@ -314,19 +313,19 @@
       const tbody = document.getElementById('student-list-body');
       
       // 번호순 오름차순 정렬
-      const sortedStudents = [...students].sort((a, b) => parseInt(a.num) - parseInt(b.num));
+      const myStudents = [...allStudents].sort((a, b) => parseInt(a.num) - parseInt(b.num));
       
-      document.getElementById('total-count').innerText = `총 ${sortedStudents.length}명`;
+      document.getElementById('total-count').innerText = `총 ${myStudents.length}명`;
 
-      if (sortedStudents.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-slate-400">
+      if (myStudents.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-12 text-center text-slate-400">
           아직 등록된 학생이 없습니다. 위 폼에서 학생을 추가해주세요.
         </td></tr>`;
         return;
       }
 
       let html = '';
-      sortedStudents.forEach(student => {
+      myStudents.forEach(student => {
         student.applications.forEach((app, index) => {
           const typeInfo = SCHEDULE_DATA.find(t => t.id === app.schoolType);
           const isCompleted = app.status === 'completed';
@@ -340,10 +339,14 @@
             html += `<td rowspan="${student.applications.length}" class="p-4 font-semibold text-slate-800 bg-white border-r border-slate-100 align-middle">${student.name}</td>`;
           }
 
+          // 지원 학교, 접수 기간, 상태, 관리 버튼 렌더링
           html += `
             <td class="p-4">
               <div class="font-bold text-slate-800">${app.schoolName}</div>
               <div class="text-xs text-blue-600 mt-0.5">${typeInfo ? typeInfo.type : ''}</div>
+            </td>
+            <td class="p-4 text-center hidden sm:table-cell">
+              <span class="inline-block px-2.5 py-1 bg-slate-100 text-slate-700 rounded text-xs font-medium">${typeInfo ? typeInfo.dates : ''}</span>
             </td>
             <td class="p-4 text-center">
               <button onclick="toggleStatus('${student.id}', '${app.id}')" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors w-full ${isCompleted ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">
