@@ -21,138 +21,100 @@
     ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-    /* 화면 전환용 유틸리티 */
-    .hidden-screen { display: none !important; }
+    .hidden-modal { display: none !important; }
   </style>
 </head>
 <body class="text-slate-800">
 
-  <!-- ==========================================
-       화면 1: 반 선택 진입 화면 (로그인)
-       ========================================== -->
-  <div id="class-selection-screen" class="min-h-screen bg-slate-100 flex items-center justify-center p-4 font-sans">
-    <div class="bg-white max-w-md w-full rounded-2xl shadow-xl overflow-hidden relative">
-      <div class="bg-emerald-600 p-8 text-center text-white">
-        <i class="fa-solid fa-database text-6xl opacity-90 mb-4"></i>
-        <h1 class="text-2xl font-bold">2026학년도 고입 진학 관리</h1>
-        <p class="text-emerald-100 mt-2">화명중학교 3학년 교사용 (구글 시트 연동)</p>
-      </div>
-      <form id="login-form" class="p-8 space-y-6">
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 mb-2 text-center">선생님, 몇 반을 관리하시나요?</label>
-          <div class="flex items-center gap-3">
-            <input type="text" id="class-input" autofocus class="flex-1 p-3 text-center text-xl font-bold border-2 border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition-all" placeholder="예: 1">
-            <span class="text-xl font-bold text-slate-600">반</span>
-          </div>
-        </div>
-        <button type="submit" class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-users text-lg"></i> 우리 반 관리 시작하기
-        </button>
-      </form>
-    </div>
-  </div>
-
-  <!-- ==========================================
-       화면 2: 메인 대시보드 화면
-       ========================================== -->
-  <div id="dashboard-screen" class="hidden-screen min-h-screen p-4 md:p-8">
+  <div class="min-h-screen p-4 md:p-8">
     <div class="max-w-6xl mx-auto space-y-6">
       
       <!-- 헤더 -->
-      <header class="bg-emerald-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center gap-4 flex-wrap">
+      <header class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center gap-4 flex-wrap">
         <div class="flex items-center gap-4">
           <i class="fa-solid fa-graduation-cap text-4xl"></i>
           <div>
             <h1 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
-              화명중 3학년 <span id="display-class" class="text-yellow-300"></span>
+              2026학년도 고입 진학 관리
             </h1>
-            <p class="text-emerald-100 mt-1 flex items-center gap-1.5 text-sm sm:text-base">
-              <i class="fa-solid fa-database"></i> 구글 스프레드시트 동기화 모드
+            <p class="text-blue-100 mt-1 flex items-center gap-1.5 text-sm sm:text-base">
+              화명중학교 3학년 담임용 (개인 PC 전용)
             </p>
           </div>
         </div>
         
         <div class="flex items-center gap-3">
-          <!-- 상태 표시 배지 -->
-          <span id="sync-status-badge" class="hidden sm:flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full text-white bg-red-500/80">
-            <i class="fa-solid fa-server"></i> 연결 안됨
+          <!-- 자동 저장 상태 표시 배지 -->
+          <span class="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full text-blue-800 bg-blue-100 border border-blue-200">
+            <i class="fa-solid fa-cloud-arrow-down"></i> 브라우저 자동저장 켜짐
           </span>
-
-          <button onclick="fetchStudents()" id="refresh-btn" class="hidden-screen sm:flex items-center gap-1.5 text-sm font-medium bg-emerald-700/50 hover:bg-emerald-700 px-3 py-1.5 rounded-full transition border border-emerald-400">
-            <i class="fa-solid fa-rotate-right"></i> 새로고침
-          </button>
-
-          <!-- 설정 버튼 -->
-          <button onclick="openSettings()" class="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20">
-            <i class="fa-solid fa-gear"></i> 설정
-          </button>
-          
-          <!-- 로그아웃(반 변경) 버튼 -->
-          <button onclick="logoutClass()" class="flex items-center gap-1.5 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-sm font-medium transition-colors border border-white/20">
-            <i class="fa-solid fa-right-from-bracket"></i> 반 변경
-          </button>
         </div>
       </header>
 
-      <!-- URL 미등록 경고창 -->
-      <div id="no-url-warning" class="hidden-screen bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm flex items-start gap-3">
-        <i class="fa-solid fa-circle-exclamation text-red-500 text-xl mt-0.5 shrink-0"></i>
+      <!-- 안내 메시지 -->
+      <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg shadow-sm flex items-start gap-3">
+        <i class="fa-solid fa-circle-info text-blue-500 text-xl mt-0.5 shrink-0"></i>
         <div>
-          <h3 class="text-red-800 font-bold mb-1">구글 스프레드시트가 연결되지 않았습니다!</h3>
-          <p class="text-red-700 text-sm">현재 데이터를 입력해도 저장되지 않습니다. 우측 상단의 [설정] 버튼을 눌러 발급받으신 '웹 앱 URL'을 등록해주세요.</p>
+          <h3 class="text-blue-800 font-bold mb-1">현재 사용 중인 PC에 데이터가 자동 저장됩니다.</h3>
+          <p class="text-blue-700 text-sm">새로고침을 하거나 브라우저를 다시 켜도 데이터가 유지됩니다. 단, 다른 컴퓨터나 스마트폰에서 접속하면 데이터가 보이지 않으니 현재 PC(교무실 자리 등)에서 전담하여 관리해 주세요.</p>
         </div>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        <!-- 좌측 패널 -->
+        <!-- 좌측 패널 (전형일정 / 학군 정보) -->
         <div class="space-y-6">
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
-              <i class="fa-regular fa-calendar text-emerald-500 text-xl"></i> 주요 고입 전형 일정
+              <i class="fa-regular fa-calendar text-blue-500 text-xl"></i> 주요 고입 전형 일정
             </h2>
             <div id="schedule-list" class="space-y-3"></div>
+            <div class="mt-4 p-3 bg-orange-50 text-orange-800 rounded-lg text-xs flex gap-2 items-start">
+              <i class="fa-solid fa-circle-exclamation mt-0.5 text-base"></i>
+              <p>전기학교(과학고, 특성화고 등) 1개교 합격 시 후기학교 지원이 불가합니다. 이중지원에 유의해주세요.</p>
+            </div>
           </div>
 
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
-              <i class="fa-solid fa-location-dot text-blue-500 text-xl"></i> 북부학군 평준화 일반고
+              <i class="fa-solid fa-location-dot text-emerald-500 text-xl"></i> 북부학군 평준화 일반고
             </h2>
+            <p class="text-sm text-slate-600 mb-3">제2·4지망 대상 학교입니다.</p>
             <div id="school-list" class="flex flex-wrap gap-2"></div>
           </div>
         </div>
 
-        <!-- 우측 패널 -->
+        <!-- 우측 패널 (학생 등록 / 목록) -->
         <div class="lg:col-span-2 space-y-6">
           
           <!-- 학생 등록 폼 -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
-              <i class="fa-solid fa-user-plus text-indigo-500 text-xl"></i> <span id="form-class-title"></span>반 진학 희망 추가
+              <i class="fa-solid fa-user-plus text-indigo-500 text-xl"></i> 진학 희망 추가
             </h2>
             <form id="add-student-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="flex gap-4">
                 <div class="w-1/3">
                   <label class="block text-xs font-semibold text-slate-500 mb-1">번호</label>
-                  <input type="number" id="form-num" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="예: 1">
+                  <input type="number" id="form-num" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="예: 1">
                 </div>
                 <div class="w-2/3">
                   <label class="block text-xs font-semibold text-slate-500 mb-1">이름</label>
-                  <input type="text" id="form-name" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="예: 홍길동">
+                  <input type="text" id="form-name" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="예: 홍길동">
                 </div>
               </div>
               
               <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1">지원 전형 유형</label>
-                <select id="form-type" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none"></select>
+                <select id="form-type" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></select>
               </div>
 
               <div class="md:col-span-2 flex gap-4 items-end">
                 <div class="flex-1">
                   <label class="block text-xs font-semibold text-slate-500 mb-1">희망 고등학교명</label>
-                  <input type="text" id="form-school" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="학교명을 입력하세요">
+                  <input type="text" id="form-school" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="학교명을 입력하세요 (예: 화명고)">
                 </div>
-                <button type="submit" id="submit-btn" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors whitespace-nowrap shadow-sm">
+                <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors whitespace-nowrap shadow-sm">
                   명단에 추가
                 </button>
               </div>
@@ -160,16 +122,10 @@
           </div>
 
           <!-- 목록 테이블 -->
-          <div class="bg-white p-0 rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
-            <div id="loading-overlay" class="hidden-screen absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 flex items-center justify-center">
-              <div class="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-emerald-700 font-bold text-sm">
-                <i class="fa-solid fa-spinner fa-spin text-lg"></i> 구글 시트에 기록 중...
-              </div>
-            </div>
-
+          <div class="bg-white p-0 rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="p-5 border-b border-slate-200 flex justify-between items-center bg-slate-50">
               <h2 class="text-lg font-bold flex items-center gap-2 text-slate-800">
-                <i class="fa-solid fa-circle-check text-green-500 text-xl"></i> <span id="table-class-title"></span>반 접수 현황
+                <i class="fa-solid fa-list-check text-green-500 text-xl"></i> 원서 접수 현황
               </h2>
               <div id="total-count" class="text-sm text-slate-500 font-medium">총 0명</div>
             </div>
@@ -196,41 +152,20 @@
     </div>
   </div>
 
-  <!-- 설정 모달 -->
-  <div id="settings-modal" class="hidden-screen fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div class="bg-white rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl">
-      <h3 class="text-xl font-bold mb-2 text-slate-800 flex items-center gap-2">
-        <i class="fa-solid fa-database text-emerald-600"></i> 구글 스프레드시트 연동
-      </h3>
-      <p class="text-slate-600 mb-6 text-sm leading-relaxed">
-        가이드를 참고하여 발급받으신 <b>웹 앱 URL</b>을 아래에 붙여넣어 주세요.<br/>
-        동료 선생님들께 사이트를 공유하실 때, 이 주소도 함께 알려주시면 다 같이 하나의 시트에 기록을 모을 수 있습니다.
-      </p>
-      <div class="mb-6">
-        <label class="block text-sm font-bold text-slate-700 mb-2">웹 앱 URL (https://script.google.com/...)</label>
-        <textarea id="settings-url-input" placeholder="여기에 복사한 URL을 붙여넣으세요" class="w-full p-3 border-2 border-slate-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none h-24 text-sm font-mono break-all"></textarea>
-      </div>
-      <div class="flex justify-end gap-3">
-        <button onclick="closeModal('settings-modal')" class="px-5 py-2.5 font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">취소</button>
-        <button onclick="saveSettings()" class="px-5 py-2.5 font-bold bg-emerald-600 text-white hover:bg-emerald-700 rounded-xl transition-colors">저장 후 연동하기</button>
-      </div>
-    </div>
-  </div>
-
   <!-- 삭제 확인 모달 -->
-  <div id="delete-modal" class="hidden-screen fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+  <div id="delete-modal" class="hidden-modal fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
     <div class="bg-white rounded-xl p-6 max-w-sm w-full shadow-xl">
       <h3 class="text-lg font-bold mb-2 text-slate-800">지원 정보 삭제</h3>
-      <p class="text-slate-600 mb-6 text-sm">정말 이 지원 희망 정보를 삭제하시겠습니까? (구글 시트에서도 삭제됩니다.)</p>
+      <p class="text-slate-600 mb-6 text-sm">정말 이 지원 희망 정보를 삭제하시겠습니까?</p>
       <div class="flex justify-end gap-2">
-        <button onclick="closeModal('delete-modal')" class="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">취소</button>
+        <button onclick="closeModal()" class="px-4 py-2 font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">취소</button>
         <button onclick="confirmDelete()" class="px-4 py-2 font-medium bg-red-600 text-white hover:bg-red-700 rounded-lg transition-colors">삭제</button>
       </div>
     </div>
   </div>
 
   <!-- ==========================================
-       자바스크립트 로직 (Vanilla JS)
+       자바스크립트 로직 (Vanilla JS - LocalStorage)
        ========================================== -->
   <script>
     // --- 상수 및 데이터 정의 ---
@@ -249,17 +184,15 @@
       '화명고', '금명여고', '주례여고', '성도고', '경혜여고', '대덕여고'
     ];
 
-    // --- 상태 변수 ---
-    let currentClass = localStorage.getItem('hwamyeong_class_2026') || '';
-    let gasUrl = localStorage.getItem('hwamyeong_gas_url') || '';
-    let allStudents = [];
-    let isSaving = false;
+    // --- 상태 변수 (LocalStorage 연동) ---
+    // 로컬 스토리지에서 데이터를 불러옵니다. 없으면 빈 배열[]로 시작합니다.
+    let students = JSON.parse(localStorage.getItem('hwamyeong_local_data')) || [];
     let deleteTarget = { studentId: null, appId: null };
 
     // --- 초기화 ---
     window.onload = () => {
       renderStaticData();
-      checkStateAndRenderScreen();
+      renderStudents();
     };
 
     // 정적 데이터 UI 그리기 (일정표, 학군 목록, Select 태그)
@@ -268,7 +201,7 @@
       const scheduleContainer = document.getElementById('schedule-list');
       scheduleContainer.innerHTML = SCHEDULE_DATA.map(item => `
         <div class="p-3 bg-slate-50 rounded-lg text-sm border border-slate-100">
-          <div class="font-semibold text-emerald-700">${item.type}</div>
+          <div class="font-semibold text-blue-700">${item.type}</div>
           <div class="text-slate-600 mt-1">${item.dates}</div>
         </div>
       `).join('');
@@ -276,7 +209,7 @@
       // 2. 북부 학군 렌더링
       const schoolContainer = document.getElementById('school-list');
       schoolContainer.innerHTML = BUKBU_SCHOOLS.map(school => `
-        <span class="px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium border border-blue-200">${school}</span>
+        <span class="px-2.5 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-medium border border-emerald-200">${school}</span>
       `).join('');
 
       // 3. 셀렉트 박스 렌더링
@@ -284,104 +217,17 @@
       selectBox.innerHTML = SCHEDULE_DATA.map(item => `<option value="${item.id}">${item.type}</option>`).join('');
     }
 
-    // 화면 전환 및 초기 데이터 세팅
-    function checkStateAndRenderScreen() {
-      const loginScreen = document.getElementById('class-selection-screen');
-      const dashboardScreen = document.getElementById('dashboard-screen');
-      
-      if (!currentClass) {
-        loginScreen.classList.remove('hidden-screen');
-        dashboardScreen.classList.add('hidden-screen');
-      } else {
-        loginScreen.classList.add('hidden-screen');
-        dashboardScreen.classList.remove('hidden-screen');
-        
-        // UI에 반 번호 반영
-        document.getElementById('display-class').innerText = `${currentClass}반`;
-        document.getElementById('form-class-title').innerText = currentClass;
-        document.getElementById('table-class-title').innerText = currentClass;
-        
-        updateSyncStatusUI();
-        
-        if (gasUrl) {
-          fetchStudents();
-        } else {
-          renderStudents(); // URL이 없으면 빈 화면 표시
-        }
-      }
+    // 데이터를 저장소에 영구 기록하고 화면 갱신
+    function saveDataAndRender() {
+      localStorage.setItem('hwamyeong_local_data', JSON.stringify(students));
+      renderStudents();
     }
 
     // --- 이벤트 핸들러 ---
     
-    // 1. 반 로그인
-    document.getElementById('login-form').addEventListener('submit', function(e) {
+    // 학생 추가 (Form Submit)
+    document.getElementById('add-student-form').addEventListener('submit', function(e) {
       e.preventDefault();
-      const inputVal = document.getElementById('class-input').value.trim();
-      if (!inputVal) return alert('반을 입력해주세요.');
-      
-      currentClass = inputVal;
-      localStorage.setItem('hwamyeong_class_2026', currentClass);
-      checkStateAndRenderScreen();
-    });
-
-    // 2. 반 로그아웃
-    function logoutClass() {
-      currentClass = '';
-      localStorage.removeItem('hwamyeong_class_2026');
-      checkStateAndRenderScreen();
-    }
-
-    // 3. 학생 데이터 가져오기 (GET)
-    async function fetchStudents() {
-      if (!gasUrl) return;
-      
-      const tbody = document.getElementById('student-list-body');
-      tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-slate-500"><i class="fa-solid fa-spinner fa-spin text-xl text-emerald-500 mb-2"></i><br/>구글 시트에서 데이터를 불러오는 중입니다...</td></tr>`;
-      
-      try {
-        const response = await fetch(`${gasUrl}?className=${currentClass}`);
-        if (!response.ok) throw new Error('Network error');
-        const data = await response.json();
-        allStudents = data;
-        renderStudents();
-      } catch (error) {
-        console.error(error);
-        tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-red-500">데이터를 불러오지 못했습니다. 주소가 정확한지 확인해주세요.</td></tr>`;
-      }
-    }
-
-    // 4. 구글 시트로 데이터 저장 (POST)
-    async function saveToSheet(action, studentId, updatedStudent = null) {
-      if (!gasUrl) {
-        alert('설정에서 구글 웹 앱 URL을 먼저 등록해주세요!');
-        return false;
-      }
-      
-      isSaving = true;
-      toggleLoadingOverlay(true);
-      
-      try {
-        const payload = { action, studentId, student: updatedStudent };
-        await fetch(gasUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify(payload)
-        });
-        return true;
-      } catch (err) {
-        console.error(err);
-        alert('데이터 저장 중 오류가 발생했습니다.');
-        return false;
-      } finally {
-        isSaving = false;
-        toggleLoadingOverlay(false);
-      }
-    }
-
-    // 5. 학생 추가 (Form Submit)
-    document.getElementById('add-student-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      if (!gasUrl) return alert('설정(우측 상단 톱니바퀴)에서 웹 앱 URL을 먼저 등록해주세요.');
       
       const num = document.getElementById('form-num').value.trim();
       const name = document.getElementById('form-name').value.trim();
@@ -395,114 +241,92 @@
         status: 'pending'
       };
 
-      let updatedStudent;
-      const existingIdx = allStudents.findIndex(s => s.num === num && s.className === currentClass);
+      const existingIdx = students.findIndex(s => s.num === num);
       
       if (existingIdx > -1) {
-        // 기존 학생에 추가
-        updatedStudent = {
-          ...allStudents[existingIdx],
-          name: name,
-          applications: [...allStudents[existingIdx].applications, newApp]
-        };
+        // 기존 학생 번호가 있으면 이름 업데이트 및 지원학교 추가(병합)
+        students[existingIdx].name = name;
+        students[existingIdx].applications.push(newApp);
       } else {
-        // 새 학생
-        updatedStudent = {
+        // 새 학생 객체 생성
+        students.push({
           id: 's' + Date.now().toString(),
-          className: currentClass,
           num: num,
           name: name,
           applications: [newApp]
-        };
+        });
       }
 
-      const success = await saveToSheet('save', updatedStudent.id, updatedStudent);
-      if (success) {
-        if (existingIdx > -1) {
-          allStudents[existingIdx] = updatedStudent;
-        } else {
-          allStudents.push(updatedStudent);
-        }
-        
-        // 폼 초기화
-        document.getElementById('form-num').value = '';
-        document.getElementById('form-name').value = '';
-        document.getElementById('form-school').value = '';
-        renderStudents();
-      }
+      // 폼 비우기
+      document.getElementById('form-num').value = '';
+      document.getElementById('form-name').value = '';
+      document.getElementById('form-school').value = '';
+      
+      saveDataAndRender();
     });
 
-    // 6. 접수 상태 변경
-    async function toggleStatus(studentId, appIdToToggle) {
-      const studentIdx = allStudents.findIndex(s => s.id === studentId);
+    // 접수 상태 변경
+    function toggleStatus(studentId, appIdToToggle) {
+      const studentIdx = students.findIndex(s => s.id === studentId);
       if (studentIdx === -1) return;
       
-      const student = allStudents[studentIdx];
-      const updatedApps = student.applications.map(app => 
-        app.id === appIdToToggle ? { ...app, status: app.status === 'pending' ? 'completed' : 'pending' } : app
-      );
+      const appIdx = students[studentIdx].applications.findIndex(a => a.id === appIdToToggle);
+      if (appIdx === -1) return;
+
+      const currentStatus = students[studentIdx].applications[appIdx].status;
+      students[studentIdx].applications[appIdx].status = currentStatus === 'pending' ? 'completed' : 'pending';
       
-      const updatedStudent = { ...student, applications: updatedApps };
-      const success = await saveToSheet('save', studentId, updatedStudent);
-      
-      if (success) {
-        allStudents[studentIdx] = updatedStudent;
-        renderStudents();
-      }
+      saveDataAndRender();
     }
 
-    // 7. 삭제 확인 모달 열기
+    // 삭제 확인 모달 열기
     function requestDelete(studentId, appId) {
       deleteTarget = { studentId, appId };
-      document.getElementById('delete-modal').classList.remove('hidden-screen');
+      document.getElementById('delete-modal').classList.remove('hidden-modal');
     }
 
-    // 8. 삭제 확정
-    async function confirmDelete() {
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('delete-modal').classList.add('hidden-modal');
+      deleteTarget = { studentId: null, appId: null };
+    }
+
+    // 삭제 확정
+    function confirmDelete() {
       const { studentId, appId } = deleteTarget;
-      const studentIdx = allStudents.findIndex(s => s.id === studentId);
+      const studentIdx = students.findIndex(s => s.id === studentId);
       if (studentIdx === -1) return;
 
-      const student = allStudents[studentIdx];
-      const updatedApps = student.applications.filter(a => a.id !== appId);
+      // 해당 지원 내역만 삭제
+      students[studentIdx].applications = students[studentIdx].applications.filter(a => a.id !== appId);
       
-      let success = false;
-      if (updatedApps.length === 0) {
-        // 시트 행 삭제
-        success = await saveToSheet('delete', studentId);
-        if (success) allStudents.splice(studentIdx, 1);
-      } else {
-        // 앱만 제거 후 갱신
-        const updatedStudent = { ...student, applications: updatedApps };
-        success = await saveToSheet('save', studentId, updatedStudent);
-        if (success) allStudents[studentIdx] = updatedStudent;
+      // 만약 지원 내역이 0개가 되면 학생 데이터 자체를 날림
+      if (students[studentIdx].applications.length === 0) {
+        students.splice(studentIdx, 1);
       }
 
-      closeModal('delete-modal');
-      if (success) renderStudents();
+      closeModal();
+      saveDataAndRender();
     }
 
     // --- UI 렌더링 헬퍼 ---
-
     function renderStudents() {
       const tbody = document.getElementById('student-list-body');
       
-      // 내 반 학생 필터 및 번호순 정렬
-      const myStudents = allStudents
-        .filter(s => s.className === currentClass)
-        .sort((a, b) => parseInt(a.num) - parseInt(b.num));
+      // 번호순 오름차순 정렬
+      const sortedStudents = [...students].sort((a, b) => parseInt(a.num) - parseInt(b.num));
       
-      document.getElementById('total-count').innerText = `총 ${myStudents.length}명`;
+      document.getElementById('total-count').innerText = `총 ${sortedStudents.length}명`;
 
-      if (myStudents.length === 0) {
+      if (sortedStudents.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5" class="p-12 text-center text-slate-400">
-          ${gasUrl ? '아직 등록된 학생이 없습니다.' : '스프레드시트가 연결되지 않았습니다.'}
+          아직 등록된 학생이 없습니다. 위 폼에서 학생을 추가해주세요.
         </td></tr>`;
         return;
       }
 
       let html = '';
-      myStudents.forEach(student => {
+      sortedStudents.forEach(student => {
         student.applications.forEach((app, index) => {
           const typeInfo = SCHEDULE_DATA.find(t => t.id === app.schoolType);
           const isCompleted = app.status === 'completed';
@@ -510,7 +334,7 @@
           
           html += `<tr class="hover:bg-slate-50 transition-colors ${isCompleted ? 'bg-slate-50/50' : ''} ${isLast ? 'border-b-2 border-slate-200' : 'border-b border-slate-100'}">`;
           
-          // RowSpan 처리 (병합)
+          // RowSpan 처리 (다중 지원 시 세로로 셀 병합)
           if (index === 0) {
             html += `<td rowspan="${student.applications.length}" class="p-4 text-center font-medium text-slate-700 bg-white border-r border-slate-100 align-middle">${student.num}</td>`;
             html += `<td rowspan="${student.applications.length}" class="p-4 font-semibold text-slate-800 bg-white border-r border-slate-100 align-middle">${student.name}</td>`;
@@ -522,13 +346,13 @@
               <div class="text-xs text-blue-600 mt-0.5">${typeInfo ? typeInfo.type : ''}</div>
             </td>
             <td class="p-4 text-center">
-              <button onclick="toggleStatus('${student.id}', '${app.id}')" ${!gasUrl || isSaving ? 'disabled' : ''} class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors w-full ${isCompleted ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">
+              <button onclick="toggleStatus('${student.id}', '${app.id}')" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors w-full ${isCompleted ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">
                 <i class="${isCompleted ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}"></i>
                 ${isCompleted ? '접수완료' : '접수전'}
               </button>
             </td>
             <td class="p-4 text-center">
-              <button onclick="requestDelete('${student.id}', '${app.id}')" ${!gasUrl || isSaving ? 'disabled' : ''} class="p-1.5 text-slate-400 hover:text-red-500 disabled:opacity-50 rounded transition-colors" title="이 지원 내역 삭제">
+              <button onclick="requestDelete('${student.id}', '${app.id}')" class="p-1.5 text-slate-400 hover:text-red-500 rounded transition-colors" title="삭제">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </td>
@@ -536,58 +360,6 @@
         });
       });
       tbody.innerHTML = html;
-    }
-
-    function updateSyncStatusUI() {
-      const badge = document.getElementById('sync-status-badge');
-      const warning = document.getElementById('no-url-warning');
-      const btn = document.getElementById('refresh-btn');
-      const submitBtn = document.getElementById('submit-btn');
-
-      if (gasUrl) {
-        badge.classList.remove('flex', 'bg-red-500/80');
-        badge.classList.add('hidden-screen');
-        warning.classList.add('hidden-screen');
-        btn.classList.remove('hidden-screen');
-        submitBtn.disabled = false;
-      } else {
-        badge.classList.remove('hidden-screen');
-        badge.classList.add('flex', 'bg-red-500/80');
-        warning.classList.remove('hidden-screen');
-        btn.classList.add('hidden-screen');
-        submitBtn.disabled = true;
-      }
-    }
-
-    function toggleLoadingOverlay(show) {
-      const overlay = document.getElementById('loading-overlay');
-      const submitBtn = document.getElementById('submit-btn');
-      if (show) {
-        overlay.classList.remove('hidden-screen');
-        submitBtn.disabled = true;
-      } else {
-        overlay.classList.add('hidden-screen');
-        submitBtn.disabled = !gasUrl;
-      }
-    }
-
-    // --- 설정 및 모달 창 헬퍼 ---
-    function openSettings() {
-      document.getElementById('settings-url-input').value = gasUrl;
-      document.getElementById('settings-modal').classList.remove('hidden-screen');
-    }
-
-    function saveSettings() {
-      const url = document.getElementById('settings-url-input').value.trim();
-      gasUrl = url;
-      localStorage.setItem('hwamyeong_gas_url', url);
-      closeModal('settings-modal');
-      updateSyncStatusUI();
-      if (gasUrl) fetchStudents();
-    }
-
-    function closeModal(modalId) {
-      document.getElementById(modalId).classList.add('hidden-screen');
     }
   </script>
 </body>
