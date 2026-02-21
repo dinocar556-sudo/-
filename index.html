@@ -27,7 +27,7 @@
 <body class="text-slate-800">
 
   <div class="min-h-screen p-4 md:p-8">
-    <div class="max-w-6xl mx-auto space-y-6">
+    <div class="max-w-7xl mx-auto space-y-6">
       
       <!-- 헤더 -->
       <header class="bg-blue-600 text-white p-6 rounded-2xl shadow-lg flex justify-between items-center gap-4 flex-wrap">
@@ -60,63 +60,97 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
         
         <!-- 좌측 패널 (전형일정 / 학군 정보) -->
-        <div class="space-y-6">
+        <div class="space-y-6 xl:col-span-1">
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
-              <i class="fa-regular fa-calendar text-blue-500 text-xl"></i> 주요 고입 전형 일정
+              <i class="fa-regular fa-calendar text-blue-500 text-xl"></i> 고입 전형 일정
             </h2>
             <div id="schedule-list" class="space-y-3"></div>
-            <div class="mt-4 p-3 bg-orange-50 text-orange-800 rounded-lg text-xs flex gap-2 items-start">
-              <i class="fa-solid fa-circle-exclamation mt-0.5 text-base"></i>
-              <p>전기학교(과학고, 특성화고 등) 1개교 합격 시 후기학교 지원이 불가합니다. 이중지원에 유의해주세요.</p>
-            </div>
           </div>
 
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
-              <i class="fa-solid fa-location-dot text-emerald-500 text-xl"></i> 북부학군 평준화 일반고
+              <i class="fa-solid fa-location-dot text-emerald-500 text-xl"></i> 북부학군 일반고
             </h2>
-            <p class="text-sm text-slate-600 mb-3">제2·4지망 대상 학교입니다.</p>
+            <p class="text-xs text-slate-500 mb-3">평준화 일반고 후기 2·4지망(지역) 대상 학교입니다.</p>
             <div id="school-list" class="flex flex-wrap gap-2"></div>
           </div>
         </div>
 
         <!-- 우측 패널 (학생 등록 / 목록) -->
-        <div class="lg:col-span-2 space-y-6">
+        <div class="xl:col-span-3 space-y-6">
           
           <!-- 학생 등록 폼 -->
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
               <i class="fa-solid fa-user-plus text-indigo-500 text-xl"></i> 진학 희망 추가
             </h2>
-            <form id="add-student-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="flex gap-4">
-                <div class="w-1/3">
+            <form id="add-student-form" class="space-y-4">
+              <!-- 첫 번째 줄: 번호, 이름, 성적, 비고 -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
                   <label class="block text-xs font-semibold text-slate-500 mb-1">번호</label>
                   <input type="number" id="form-num" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="예: 1">
                 </div>
-                <div class="w-2/3">
+                <div>
                   <label class="block text-xs font-semibold text-slate-500 mb-1">이름</label>
                   <input type="text" id="form-name" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="예: 홍길동">
                 </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">성적 (%)</label>
+                  <input type="number" id="form-score" step="0.001" min="0" max="100" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="예: 12.345">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">비고 (특례 등)</label>
+                  <!-- datalist를 활용하여 지침서에 있는 주요 특례 항목을 자동완성으로 제공 -->
+                  <input type="text" id="form-note" list="note-options" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="예: 다자녀">
+                  <datalist id="note-options">
+                    <option value="다자녀 (3자녀 이상)"></option>
+                    <option value="교직원 자녀"></option>
+                    <option value="국가유공자 (보훈대상자)"></option>
+                    <option value="체육특기자"></option>
+                    <option value="특수교육대상자"></option>
+                    <option value="지체장애인"></option>
+                    <option value="쌍생아"></option>
+                  </datalist>
+                </div>
               </div>
               
-              <div>
-                <label class="block text-xs font-semibold text-slate-500 mb-1">지원 전형 유형</label>
-                <select id="form-type" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></select>
-              </div>
-
-              <div class="md:col-span-2 flex gap-4 items-end">
-                <div class="flex-1">
-                  <label class="block text-xs font-semibold text-slate-500 mb-1">희망 고등학교명</label>
-                  <input type="text" id="form-school" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="학교명을 입력하세요 (예: 화명고)">
+              <!-- 두 번째 줄: 모집시기/지망, 전형 유형, 학교명, 제출 버튼 -->
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">모집 시기 및 지망</label>
+                  <select id="form-choice" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-700">
+                    <optgroup label="전기 학교">
+                      <option value="전기 1지망">전기 1지망</option>
+                      <option value="전기 2지망">전기 2지망</option>
+                      <option value="전기 3지망">전기 3지망</option>
+                      <option value="전기 4지망">전기 4지망</option>
+                    </optgroup>
+                    <optgroup label="후기 학교 (평준화 일반고 등)">
+                      <option value="후기 1지망 (광역)">후기 1지망 (광역)</option>
+                      <option value="후기 2지망 (지역)">후기 2지망 (지역)</option>
+                      <option value="후기 3지망 (광역)">후기 3지망 (광역)</option>
+                      <option value="후기 4지망 (지역)">후기 4지망 (지역)</option>
+                    </optgroup>
+                  </select>
                 </div>
-                <button type="submit" class="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors whitespace-nowrap shadow-sm">
-                  명단에 추가
-                </button>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">지원 전형 유형</label>
+                  <select id="form-type" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-500 mb-1">희망 고등학교명</label>
+                  <input type="text" id="form-school" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="학교명 (예: 화명고)">
+                </div>
+                <div class="flex items-end">
+                  <button type="submit" class="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors whitespace-nowrap shadow-sm">
+                    명단에 추가
+                  </button>
+                </div>
               </div>
             </form>
           </div>
@@ -131,15 +165,17 @@
             </div>
             
             <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
+              <table class="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr class="bg-white border-b border-slate-200 text-sm text-slate-500">
-                    <th class="p-4 font-semibold text-center w-16">번호</th>
-                    <th class="p-4 font-semibold w-24">이름</th>
-                    <th class="p-4 font-semibold">지원 학교 및 유형</th>
-                    <th class="p-4 font-semibold text-center hidden sm:table-cell">원서 접수 기간</th>
-                    <th class="p-4 font-semibold text-center w-28">접수 상태</th>
-                    <th class="p-4 font-semibold text-center w-16">관리</th>
+                    <th class="p-3 font-semibold text-center w-12">번호</th>
+                    <th class="p-3 font-semibold w-20">이름</th>
+                    <th class="p-3 font-semibold text-center w-20">성적(%)</th>
+                    <th class="p-3 font-semibold w-28">비고(특례)</th>
+                    <th class="p-3 font-semibold">지원 학교 및 유형</th>
+                    <th class="p-3 font-semibold text-center hidden md:table-cell">접수 기간</th>
+                    <th class="p-3 font-semibold text-center w-24">접수 상태</th>
+                    <th class="p-3 font-semibold text-center w-12">관리</th>
                   </tr>
                 </thead>
                 <tbody id="student-list-body">
@@ -166,7 +202,7 @@
   </div>
 
   <!-- ==========================================
-       자바스크립트 로직 (Vanilla JS - LocalStorage 개인용)
+       자바스크립트 로직 (Vanilla JS - LocalStorage)
        ========================================== -->
   <script>
     // --- 상수 및 데이터 정의 ---
@@ -186,8 +222,8 @@
     ];
 
     // --- 상태 변수 (LocalStorage 연동) ---
-    // 새로운 데이터 키를 사용하여 이전 '반' 정보가 있는 데이터와 충돌을 방지합니다.
-    let allStudents = JSON.parse(localStorage.getItem('hwamyeong_local_data_v4')) || [];
+    // 새로운 데이터 구조(지망 포함)를 위해 키 이름을 V6로 변경하여 충돌을 막습니다.
+    let allStudents = JSON.parse(localStorage.getItem('hwamyeong_local_data_v6')) || [];
     let deleteTarget = { studentId: null, appId: null };
 
     // --- 초기화 ---
@@ -217,7 +253,7 @@
 
     // 데이터를 저장소에 영구 기록하고 화면 갱신
     function saveDataAndRender() {
-      localStorage.setItem('hwamyeong_local_data_v4', JSON.stringify(allStudents));
+      localStorage.setItem('hwamyeong_local_data_v5', JSON.stringify(allStudents));
       renderStudents();
     }
 
@@ -229,11 +265,16 @@
       
       const num = document.getElementById('form-num').value.trim();
       const name = document.getElementById('form-name').value.trim();
+      const score = document.getElementById('form-score').value.trim();
+      const note = document.getElementById('form-note').value.trim();
+      
+      const choice = document.getElementById('form-choice').value;
       const type = document.getElementById('form-type').value;
       const school = document.getElementById('form-school').value.trim();
 
       const newApp = {
         id: Date.now().toString(),
+        choice: choice,
         schoolType: type,
         schoolName: school,
         status: 'pending'
@@ -243,8 +284,10 @@
       const existingIdx = allStudents.findIndex(s => s.num === num);
       
       if (existingIdx > -1) {
-        // 기존 학생 번호가 있으면 이름 업데이트 및 지원학교 추가(병합)
+        // 기존 학생 번호가 있으면 이름, 성적, 비고를 새로 갱신하고 지원학교 추가(세로 병합용)
         allStudents[existingIdx].name = name;
+        if(score !== '') allStudents[existingIdx].score = score;
+        if(note !== '') allStudents[existingIdx].note = note;
         allStudents[existingIdx].applications.push(newApp);
       } else {
         // 새 학생 객체 생성
@@ -252,6 +295,8 @@
           id: 's' + Date.now().toString(),
           num: num,
           name: name,
+          score: score,
+          note: note,
           applications: [newApp]
         });
       }
@@ -259,6 +304,8 @@
       // 폼 비우기
       document.getElementById('form-num').value = '';
       document.getElementById('form-name').value = '';
+      document.getElementById('form-score').value = '';
+      document.getElementById('form-note').value = '';
       document.getElementById('form-school').value = '';
       
       saveDataAndRender();
@@ -308,6 +355,21 @@
       saveDataAndRender();
     }
 
+    // 지망 순서 정렬을 위한 헬퍼 함수
+    function getChoiceOrder(choiceText) {
+      const orderMap = {
+        '전기 1지망': 1,
+        '전기 2지망': 2,
+        '전기 3지망': 3,
+        '전기 4지망': 4,
+        '후기 1지망 (광역)': 5,
+        '후기 2지망 (지역)': 6,
+        '후기 3지망 (광역)': 7,
+        '후기 4지망 (지역)': 8
+      };
+      return orderMap[choiceText] || 99;
+    }
+
     // --- UI 렌더링 헬퍼 ---
     function renderStudents() {
       const tbody = document.getElementById('student-list-body');
@@ -318,7 +380,7 @@
       document.getElementById('total-count').innerText = `총 ${myStudents.length}명`;
 
       if (myStudents.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-12 text-center text-slate-400">
+        tbody.innerHTML = `<tr><td colspan="8" class="p-12 text-center text-slate-400">
           아직 등록된 학생이 없습니다. 위 폼에서 학생을 추가해주세요.
         </td></tr>`;
         return;
@@ -326,6 +388,9 @@
 
       let html = '';
       myStudents.forEach(student => {
+        // 학생의 지원 내역(applications)을 1지망 -> 4지망 순서대로 자동 정렬
+        student.applications.sort((a, b) => getChoiceOrder(a.choice) - getChoiceOrder(b.choice));
+
         student.applications.forEach((app, index) => {
           const typeInfo = SCHEDULE_DATA.find(t => t.id === app.schoolType);
           const isCompleted = app.status === 'completed';
@@ -333,28 +398,35 @@
           
           html += `<tr class="hover:bg-slate-50 transition-colors ${isCompleted ? 'bg-slate-50/50' : ''} ${isLast ? 'border-b-2 border-slate-200' : 'border-b border-slate-100'}">`;
           
-          // RowSpan 처리 (다중 지원 시 세로로 셀 병합)
+          // RowSpan 처리 (다중 지원 시 세로로 셀 병합) - 성적과 비고도 같이 병합
           if (index === 0) {
-            html += `<td rowspan="${student.applications.length}" class="p-4 text-center font-medium text-slate-700 bg-white border-r border-slate-100 align-middle">${student.num}</td>`;
-            html += `<td rowspan="${student.applications.length}" class="p-4 font-semibold text-slate-800 bg-white border-r border-slate-100 align-middle">${student.name}</td>`;
+            html += `<td rowspan="${student.applications.length}" class="p-3 text-center font-medium text-slate-700 bg-white border-r border-slate-100 align-middle">${student.num}</td>`;
+            html += `<td rowspan="${student.applications.length}" class="p-3 font-semibold text-slate-800 bg-white border-r border-slate-100 align-middle">${student.name}</td>`;
+            html += `<td rowspan="${student.applications.length}" class="p-3 text-center text-blue-600 font-medium bg-white border-r border-slate-100 align-middle">${student.score ? student.score + '%' : '-'}</td>`;
+            html += `<td rowspan="${student.applications.length}" class="p-3 text-sm text-slate-600 bg-white border-r border-slate-100 align-middle whitespace-normal min-w-[120px]">${student.note ? student.note : '-'}</td>`;
           }
 
-          // 지원 학교, 접수 기간, 상태, 관리 버튼 렌더링
+          // 지원 학교(지망 포함), 접수 기간, 상태, 관리 버튼 렌더링
+          let choiceBadgeColor = app.choice.includes('전기') ? 'bg-purple-100 text-purple-800 border-purple-200' : 'bg-orange-100 text-orange-800 border-orange-200';
+
           html += `
-            <td class="p-4">
-              <div class="font-bold text-slate-800">${app.schoolName}</div>
-              <div class="text-xs text-blue-600 mt-0.5">${typeInfo ? typeInfo.type : ''}</div>
+            <td class="p-3">
+              <div class="flex items-center gap-2 mb-1">
+                <span class="inline-block px-1.5 py-0.5 text-[11px] font-bold rounded border ${choiceBadgeColor}">${app.choice}</span>
+                <span class="font-bold text-slate-800 text-base">${app.schoolName}</span>
+              </div>
+              <div class="text-xs text-blue-600">${typeInfo ? typeInfo.type : ''}</div>
             </td>
-            <td class="p-4 text-center hidden sm:table-cell">
-              <span class="inline-block px-2.5 py-1 bg-slate-100 text-slate-700 rounded text-xs font-medium">${typeInfo ? typeInfo.dates : ''}</span>
+            <td class="p-3 text-center hidden md:table-cell">
+              <span class="inline-block px-2 py-1 bg-slate-100 text-slate-700 rounded text-xs font-medium">${typeInfo ? typeInfo.dates : ''}</span>
             </td>
-            <td class="p-4 text-center">
-              <button onclick="toggleStatus('${student.id}', '${app.id}')" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-colors w-full ${isCompleted ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">
+            <td class="p-3 text-center">
+              <button onclick="toggleStatus('${student.id}', '${app.id}')" class="inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-full text-xs font-bold transition-colors w-full ${isCompleted ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}">
                 <i class="${isCompleted ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'}"></i>
                 ${isCompleted ? '접수완료' : '접수전'}
               </button>
             </td>
-            <td class="p-4 text-center">
+            <td class="p-3 text-center">
               <button onclick="requestDelete('${student.id}', '${app.id}')" class="p-1.5 text-slate-400 hover:text-red-500 rounded transition-colors" title="삭제">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
