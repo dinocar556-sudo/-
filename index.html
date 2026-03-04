@@ -44,8 +44,12 @@
         </div>
         
         <div class="flex items-center gap-3">
+          <!-- 엑셀(CSV) 다운로드 버튼 추가 -->
+          <button onclick="exportToCSV()" class="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg text-emerald-800 bg-emerald-100 hover:bg-emerald-200 transition-colors border border-emerald-200 shadow-sm" title="현재 데이터를 엑셀로 저장합니다">
+            <i class="fa-solid fa-file-excel"></i> 엑셀 파일로 백업
+          </button>
           <!-- 자동 저장 상태 표시 배지 -->
-          <span class="flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full text-blue-800 bg-blue-100 border border-blue-200">
+          <span class="hidden sm:flex items-center gap-1.5 text-sm font-medium px-3 py-1.5 rounded-full text-blue-800 bg-blue-100 border border-blue-200">
             <i class="fa-solid fa-cloud-arrow-down"></i> 브라우저 자동저장 켜짐
           </span>
         </div>
@@ -56,7 +60,7 @@
         <i class="fa-solid fa-circle-info text-blue-500 text-xl mt-0.5 shrink-0"></i>
         <div>
           <h3 class="text-blue-800 font-bold mb-1">현재 사용 중인 PC에 데이터가 자동 저장됩니다.</h3>
-          <p class="text-blue-700 text-sm">새로고침을 하거나 브라우저를 다시 켜도 데이터가 유지됩니다. 단, 다른 컴퓨터나 스마트폰에서 접속하면 데이터가 보이지 않으니 현재 PC(교무실 자리 등)에서 전담하여 관리해 주세요.</p>
+          <p class="text-blue-700 text-sm">새로고침을 하거나 브라우저를 다시 켜도 데이터가 유지됩니다. 단, 브라우저 방문 기록을 삭제하면 데이터가 지워질 수 있으니 <b>수시로 [엑셀 파일로 백업] 버튼을 눌러 보관</b>해 주세요.</p>
         </div>
       </div>
 
@@ -105,7 +109,6 @@
                 </div>
                 <div>
                   <label class="block text-xs font-semibold text-slate-500 mb-1">비고 (특례 등)</label>
-                  <!-- datalist를 활용하여 지침서에 있는 주요 특례 항목을 자동완성으로 제공 -->
                   <input type="text" id="form-note" list="note-options" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="예: 다자녀">
                   <datalist id="note-options">
                     <option value="다자녀 (3자녀 이상)"></option>
@@ -222,7 +225,7 @@
     ];
 
     // --- 상태 변수 (LocalStorage 연동) ---
-    // 새로운 데이터 구조(지망 포함)를 위해 키 이름을 V6로 변경하여 충돌을 막습니다.
+    // 데이터를 이어서 사용할 수 있도록 V6 유지
     let allStudents = JSON.parse(localStorage.getItem('hwamyeong_local_data_v6')) || [];
     let deleteTarget = { studentId: null, appId: null };
 
@@ -253,8 +256,58 @@
 
     // 데이터를 저장소에 영구 기록하고 화면 갱신
     function saveDataAndRender() {
-      localStorage.setItem('hwamyeong_local_data_v5', JSON.stringify(allStudents));
+      localStorage.setItem('hwamyeong_local_data_v6', JSON.stringify(allStudents));
       renderStudents();
+    }
+
+    // CSV 파일로 백업 (엑셀 다운로드)
+    function exportToCSV() {
+      if (allStudents.length === 0) {
+        alert("백업할 학생 데이터가 없습니다.");
+        return;
+      }
+
+      // 1. CSV 데이터의 헤더(첫 줄) 작성 (BOM 추가하여 한글 깨짐 방지)
+      let csvContent = "\uFEFF번호,이름,성적(%),비고(특례),지망,지원 고등학교,지원 전형 유형,접수 상태\n";
+
+      // 2. 학생 데이터를 번호순으로 정렬 후 CSV 내용 생성
+      const sortedStudents = [...allStudents].sort((a, b) => parseInt(a.num) - parseInt(b.num));
+      
+      sortedStudents.forEach(student => {
+        student.applications.forEach(app => {
+          const typeInfo = SCHEDULE_DATA.find(t => t.id === app.schoolType);
+          const typeName = typeInfo ? typeInfo.type : '';
+          const statusName = app.status === 'completed' ? '접수완료' : '접수전';
+          
+          // 각 열의 데이터가 쉼표(,)를 포함할 수 있으므로 쌍따옴표로 감싸기
+          const row = [
+            student.num,
+            `"${student.name}"`,
+            student.score || '',
+            `"${student.note || ''}"`,
+            `"${app.choice}"`,
+            `"${app.schoolName}"`,
+            `"${typeName}"`,
+            statusName
+          ];
+          csvContent += row.join(",") + "\n";
+        });
+      });
+
+      // 3. 생성된 CSV 데이터를 파일로 변환하여 브라우저 다운로드 트리거
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
+      
+      // 파일명에 오늘 날짜 추가
+      const today = new Date();
+      const dateStr = `${today.getFullYear()}${(today.getMonth()+1).toString().padStart(2, '0')}${today.getDate().toString().padStart(2, '0')}`;
+      link.setAttribute("download", `진학관리_백업_${dateStr}.csv`);
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     }
 
     // --- 이벤트 핸들러 ---
