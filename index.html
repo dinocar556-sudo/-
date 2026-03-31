@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>2026학년도 고입 진학 관리 시스템</title>
+  <title>2027학년도 고입 진학 관리 시스템</title>
   
   <!-- Tailwind CSS (디자인) -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -35,7 +35,7 @@
     <div class="bg-white max-w-md w-full rounded-2xl shadow-xl overflow-hidden relative">
       <div class="bg-blue-600 p-8 text-center text-white">
         <i class="fa-solid fa-graduation-cap text-6xl opacity-90 mb-4"></i>
-        <h1 class="text-2xl font-bold">2026학년도 고입 진학 관리</h1>
+        <h1 class="text-2xl font-bold">2027학년도 고입 진학 관리</h1>
         <p class="text-blue-100 mt-2">화명중학교 3학년 (개인 PC 전용)</p>
       </div>
       <form id="login-form" class="p-8 space-y-6">
@@ -67,13 +67,13 @@
           <div>
             <h1 class="text-xl sm:text-2xl font-bold flex items-center gap-2">
               화명중학교 3학년 <span id="display-class" class="text-yellow-300"></span>
-              <!-- 수정 버튼 개선: 팝업 제거 및 아이디 부여로 안정성 극대화 -->
+              <!-- 수정 버튼 -->
               <button id="btn-reset-class" type="button" class="ml-2 text-sm bg-indigo-500 hover:bg-indigo-600 px-3 py-1.5 rounded-lg text-white transition-all flex items-center gap-1.5 font-bold shadow-sm cursor-pointer border border-indigo-400" title="반 번호 다시 입력하기">
                 <i class="fa-solid fa-pen text-xs"></i> 반 수정
               </button>
             </h1>
             <p class="text-blue-100 mt-1 flex items-center gap-1.5 text-sm sm:text-base">
-              2026학년도 고입 진학 현황 (개인 PC 전용)
+              2027학년도 고입 진학 현황 (개인 PC 전용)
             </p>
           </div>
         </div>
@@ -101,7 +101,7 @@
         <div class="space-y-6 xl:col-span-1">
           <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
             <h2 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
-              <i class="fa-regular fa-calendar text-blue-500 text-xl"></i> 고입 전형 일정
+              <i class="fa-regular fa-calendar text-blue-500 text-xl"></i> 고입 전형 일정 (2027학년도)
             </h2>
             <div id="schedule-list" class="space-y-3"></div>
           </div>
@@ -240,15 +240,15 @@
        자바스크립트 로직 (Vanilla JS - LocalStorage)
        ========================================== -->
   <script>
-    // --- 상수 및 데이터 정의 ---
+    // --- 상수 및 데이터 정의 (2027학년도 문서 기반 업데이트) ---
     const SCHEDULE_DATA = [
-      { id: 'science', type: '과학고', dates: '2025. 8. 28.(목) ~ 9. 1.(월)' },
-      { id: 'meister', type: '마이스터고/예체능/특별(항공·해군)', dates: '2025. 10. 20.(월) ~ 10. 23.(목)' },
-      { id: 'special_special', type: '특성화고 특별전형', dates: '2025. 11. 24.(월) ~ 11. 25.(화)' },
-      { id: 'special_general', type: '특성화고 일반/고등기술/학력인정', dates: '2025. 12. 1.(월) ~ 12. 2.(화)' },
-      { id: 'general_principal', type: '학교장전형 일반고', dates: '2025. 12. 8.(월) ~ 12. 10.(수)' },
-      { id: 'foreign_intl', type: '외고/국제고/자사고', dates: '2025. 12. 8.(월) ~ 12. 10.(수)' },
-      { id: 'general_standard', type: '평준화적용 일반고', dates: '2025. 12. 8.(월) ~ 12. 10.(수)' }
+      { id: 'science', type: '과학고', dates: '2026. 9. 1.(화) ~ 9. 3.(목)' },
+      { id: 'meister', type: '마이스터고/예체능/특별(항공·해군)', dates: '2026. 10. 19.(월) ~ 10. 22.(목)' },
+      { id: 'special_special', type: '특성화고 특별전형', dates: '2026. 11. 23.(월) ~ 11. 24.(화)' },
+      { id: 'special_general', type: '특성화고 일반/고등기술/학력인정', dates: '2026. 11. 30.(월) ~ 12. 1.(화)' },
+      { id: 'general_principal', type: '학교장전형 일반고', dates: '2026. 12. 7.(월) ~ 12. 9.(수)' },
+      { id: 'foreign_intl', type: '외고/국제고/자사고', dates: '2026. 12. 7.(월) ~ 12. 9.(수)' },
+      { id: 'general_standard', type: '평준화적용 일반고', dates: '2026. 12. 7.(월) ~ 12. 9.(수)' }
     ];
 
     const BUKBU_SCHOOLS = [
@@ -257,8 +257,9 @@
     ];
 
     // --- 상태 변수 (LocalStorage 연동) ---
-    let allStudents = JSON.parse(localStorage.getItem('hwamyeong_local_data_v7')) || [];
-    let currentClass = localStorage.getItem('hwamyeong_current_class') || '';
+    // 2026년도 데이터와 섞이지 않도록 2027 전용 키를 사용합니다.
+    let allStudents = JSON.parse(localStorage.getItem('hwamyeong_local_data_2027')) || [];
+    let currentClass = localStorage.getItem('hwamyeong_current_class_2027') || '';
     let deleteTarget = { studentId: null, appId: null };
 
     // --- 초기화 ---
@@ -310,7 +311,7 @@
 
     // 데이터를 저장소에 영구 기록하고 화면 갱신
     function saveDataAndRender() {
-      localStorage.setItem('hwamyeong_local_data_v7', JSON.stringify(allStudents));
+      localStorage.setItem('hwamyeong_local_data_2027', JSON.stringify(allStudents));
       renderStudents();
     }
 
@@ -361,7 +362,7 @@
       
       const today = new Date();
       const dateStr = `${today.getFullYear()}${(today.getMonth()+1).toString().padStart(2, '0')}${today.getDate().toString().padStart(2, '0')}`;
-      link.setAttribute("download", `진학관리_${currentClass}반_${dateStr}.csv`);
+      link.setAttribute("download", `진학관리(2027학년도)_${currentClass}반_${dateStr}.csv`);
       
       document.body.appendChild(link);
       link.click();
@@ -377,7 +378,7 @@
       if (!inputVal) return alert('반을 입력해주세요.');
       
       currentClass = inputVal;
-      localStorage.setItem('hwamyeong_current_class', currentClass);
+      localStorage.setItem('hwamyeong_current_class_2027', currentClass);
       checkStateAndRenderScreen();
     });
     
@@ -477,7 +478,7 @@
     // 7. 반 초기화 (수정) 기능 - 팝업 없이 즉시 전환
     document.getElementById('btn-reset-class').addEventListener('click', function() {
       currentClass = '';
-      localStorage.removeItem('hwamyeong_current_class');
+      localStorage.removeItem('hwamyeong_current_class_2027');
       checkStateAndRenderScreen();
     });
 
