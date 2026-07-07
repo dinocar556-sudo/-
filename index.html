@@ -79,6 +79,11 @@
         </div>
         
         <div class="flex items-center gap-3">
+          <!-- 지침서 PDF 열기 버튼 -->
+          <a href="2027_admission_plan.pdf" target="_blank" class="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors border border-slate-200 shadow-sm" title="2027학년도 입학전형 기본 계획 열기">
+            <i class="fa-regular fa-file-pdf text-red-500 text-lg"></i> 지침서 보기
+          </a>
+          
           <!-- 엑셀 다운로드 버튼 -->
           <button onclick="exportToCSV()" class="flex items-center gap-1.5 text-sm font-medium px-4 py-2 rounded-lg text-emerald-800 bg-emerald-100 hover:bg-emerald-200 transition-colors border border-emerald-200 shadow-sm" title="현재 데이터를 엑셀로 저장합니다">
             <i class="fa-solid fa-file-excel"></i> 엑셀 파일로 백업
@@ -123,7 +128,7 @@
             <h2 class="text-lg font-bold flex items-center gap-2 mb-4 text-slate-800">
               <i class="fa-solid fa-user-plus text-indigo-500 text-xl"></i> <span id="form-class-title"></span>반 진학 희망 추가
             </h2>
-            <form id="add-student-form" class="space-y-4">
+            <form id="add-student-form">
               <!-- 첫 번째 줄: 번호, 이름, 성적, 비고 -->
               <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
@@ -153,36 +158,53 @@
                 </div>
               </div>
               
-              <!-- 두 번째 줄: 모집시기/지망, 전형 유형, 학교명, 제출 버튼 -->
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <!-- 두 번째 줄: 전형 유형 -->
+              <div class="mt-4">
+                <label class="block text-xs font-semibold text-slate-500 mb-1">지원 전형 유형</label>
+                <select id="form-type" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></select>
+              </div>
+
+              <!-- 세 번째 줄: 단일 지원용 (전기, 자사고 등) -->
+              <div id="single-input-section" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <div>
                   <label class="block text-xs font-semibold text-slate-500 mb-1">모집 시기 및 지망</label>
                   <select id="form-choice" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-medium text-slate-700">
-                    <optgroup label="전기 학교">
-                      <option value="전기 1지망">전기 1지망</option>
-                      <option value="전기 2지망">전기 2지망</option>
-                      <option value="전기 3지망">전기 3지망</option>
-                      <option value="전기 4지망">전기 4지망</option>
-                    </optgroup>
-                    <optgroup label="후기 학교 (평준화 일반고 등)">
-                      <option value="후기 1지망 (광역)">후기 1지망 (광역)</option>
-                      <option value="후기 2지망 (지역)">후기 2지망 (지역)</option>
-                      <option value="후기 3지망 (광역)">후기 3지망 (광역)</option>
-                      <option value="후기 4지망 (지역)">후기 4지망 (지역)</option>
-                    </optgroup>
+                    <option value="전기 지원">전기 지원 (1개교 제한)</option>
+                    <option value="후기 자사고/특목고">후기 1개교 (자사고/외고/국제고)</option>
                   </select>
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-slate-500 mb-1">지원 전형 유형</label>
-                  <select id="form-type" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"></select>
-                </div>
-                <div>
                   <label class="block text-xs font-semibold text-slate-500 mb-1">희망 고등학교명</label>
-                  <input type="text" id="form-school" required class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="학교명 (예: 화명고)">
+                  <input type="text" id="form-school" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="학교명 (예: 부산과학고)">
                 </div>
                 <div class="flex items-end">
                   <button type="submit" class="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors whitespace-nowrap shadow-sm">
                     명단에 추가
+                  </button>
+                </div>
+              </div>
+
+              <!-- 네 번째 줄: 평준화 일반고 일괄 입력용 (숨김 처리됨) -->
+              <div id="multi-input-section" class="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4 hidden bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                <div>
+                  <label class="block text-xs font-bold text-indigo-700 mb-1">1지망 (광역)</label>
+                  <input type="text" id="form-school-1" class="w-full p-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white" placeholder="예: 화명고">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-emerald-700 mb-1">2지망 (지역)</label>
+                  <input type="text" id="form-school-2" class="w-full p-2 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white" placeholder="예: 낙동고">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-indigo-700 mb-1">3지망 (광역)</label>
+                  <input type="text" id="form-school-3" class="w-full p-2 border border-indigo-200 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white" placeholder="예: 금곡고">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-emerald-700 mb-1">4지망 (지역)</label>
+                  <input type="text" id="form-school-4" class="w-full p-2 border border-emerald-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none bg-white" placeholder="예: 금명여고">
+                </div>
+                <div class="flex items-end md:col-span-1 col-span-2">
+                  <button type="submit" class="w-full px-2 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors whitespace-nowrap shadow-sm shadow-blue-200">
+                    일괄 추가 완료
                   </button>
                 </div>
               </div>
@@ -257,7 +279,6 @@
     ];
 
     // --- 상태 변수 (LocalStorage 연동) ---
-    // 2026년도 데이터와 섞이지 않도록 2027 전용 키를 사용합니다.
     let allStudents = JSON.parse(localStorage.getItem('hwamyeong_local_data_2027')) || [];
     let currentClass = localStorage.getItem('hwamyeong_current_class_2027') || '';
     let deleteTarget = { studentId: null, appId: null };
@@ -268,7 +289,7 @@
       checkStateAndRenderScreen();
     };
 
-    // 정적 데이터 UI 그리기
+    // 정적 데이터 UI 그리기 및 폼 모드 초기화
     function renderStaticData() {
       const scheduleContainer = document.getElementById('schedule-list');
       scheduleContainer.innerHTML = SCHEDULE_DATA.map(item => `
@@ -285,9 +306,40 @@
 
       const selectBox = document.getElementById('form-type');
       selectBox.innerHTML = SCHEDULE_DATA.map(item => `<option value="${item.id}">${item.type}</option>`).join('');
+      
+      // 화면 렌더링 직후 입력 모드 맞춤 세팅
+      toggleInputMode();
     }
 
-    // 화면 상태 확인 및 전환 (로그인 창 vs 대시보드)
+    // 전형 유형에 따른 입력 폼 모드 전환 로직
+    function toggleInputMode() {
+      const type = document.getElementById('form-type').value;
+      const singleSection = document.getElementById('single-input-section');
+      const multiSection = document.getElementById('multi-input-section');
+      
+      if (type === 'general_standard') {
+        // 평준화 일반고 선택 시 -> 4칸 일괄 입력 모드 켜기
+        singleSection.classList.add('hidden');
+        multiSection.classList.remove('hidden');
+        
+        document.getElementById('form-school').removeAttribute('required'); // 단일칸 검사 해제
+        document.getElementById('form-school-1').setAttribute('required', 'true'); // 최소 1,2지망은 필수
+        document.getElementById('form-school-2').setAttribute('required', 'true');
+      } else {
+        // 그 외 전형 선택 시 -> 단일 입력 모드 켜기
+        singleSection.classList.remove('hidden');
+        multiSection.classList.add('hidden');
+        
+        document.getElementById('form-school').setAttribute('required', 'true');
+        document.getElementById('form-school-1').removeAttribute('required');
+        document.getElementById('form-school-2').removeAttribute('required');
+      }
+    }
+
+    // 지원 전형 유형이 바뀔 때마다 폼을 바꿔주는 이벤트
+    document.getElementById('form-type').addEventListener('change', toggleInputMode);
+
+    // 화면 상태 확인 및 전환
     function checkStateAndRenderScreen() {
       const loginScreen = document.getElementById('class-selection-screen');
       const dashboardScreen = document.getElementById('dashboard-screen');
@@ -300,7 +352,6 @@
         loginScreen.classList.add('hidden-screen');
         dashboardScreen.classList.remove('hidden-screen');
         
-        // UI에 반 번호 반영
         document.getElementById('display-class').innerText = `${currentClass}반`;
         document.getElementById('form-class-title').innerText = currentClass;
         document.getElementById('table-class-title').innerText = currentClass;
@@ -309,27 +360,21 @@
       }
     }
 
-    // 데이터를 저장소에 영구 기록하고 화면 갱신
     function saveDataAndRender() {
       localStorage.setItem('hwamyeong_local_data_2027', JSON.stringify(allStudents));
       renderStudents();
     }
 
-    // CSV 파일로 백업 (엑셀 다운로드)
+    // CSV 엑셀 백업
     function exportToCSV() {
       if (allStudents.length === 0) {
         alert("백업할 학생 데이터가 없습니다.");
         return;
       }
 
-      // 1. CSV 데이터의 헤더 작성
       let csvContent = "\uFEFF반,번호,이름,성적(%),비고(특례),지망,지원 고등학교,지원 전형 유형,접수 상태\n";
-
-      // 2. 학생 데이터를 '반' -> '번호' 순으로 정렬
       const sortedStudents = [...allStudents].sort((a, b) => {
-        if(a.className === b.className) {
-          return parseInt(a.num) - parseInt(b.num);
-        }
+        if(a.className === b.className) return parseInt(a.num) - parseInt(b.num);
         return parseInt(a.className) - parseInt(b.className);
       });
       
@@ -340,21 +385,13 @@
           const statusName = app.status === 'completed' ? '접수완료' : '접수전';
           
           const row = [
-            student.className,
-            student.num,
-            `"${student.name}"`,
-            student.score || '',
-            `"${student.note || ''}"`,
-            `"${app.choice}"`,
-            `"${app.schoolName}"`,
-            `"${typeName}"`,
-            statusName
+            student.className, student.num, `"${student.name}"`, student.score || '',
+            `"${student.note || ''}"`, `"${app.choice}"`, `"${app.schoolName}"`, `"${typeName}"`, statusName
           ];
           csvContent += row.join(",") + "\n";
         });
       });
 
-      // 3. 브라우저 다운로드
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -371,18 +408,16 @@
 
     // --- 이벤트 핸들러 ---
 
-    // 1. 반 로그인
     document.getElementById('login-form').addEventListener('submit', function(e) {
       e.preventDefault();
       const inputVal = document.getElementById('class-input').value.trim();
       if (!inputVal) return alert('반을 입력해주세요.');
-      
       currentClass = inputVal;
       localStorage.setItem('hwamyeong_current_class_2027', currentClass);
       checkStateAndRenderScreen();
     });
     
-    // 2. 학생 추가 (Form Submit)
+    // 학생 추가 (일괄 및 단일 처리)
     document.getElementById('add-student-form').addEventListener('submit', function(e) {
       e.preventDefault();
       
@@ -390,29 +425,37 @@
       const name = document.getElementById('form-name').value.trim();
       const score = document.getElementById('form-score').value.trim();
       const note = document.getElementById('form-note').value.trim();
-      
-      const choice = document.getElementById('form-choice').value;
       const type = document.getElementById('form-type').value;
-      const school = document.getElementById('form-school').value.trim();
 
-      const newApp = {
-        id: Date.now().toString(),
-        choice: choice,
-        schoolType: type,
-        schoolName: school,
-        status: 'pending'
-      };
+      let newApps = []; // 배열에 여러 학교를 한 번에 담습니다.
 
-      // 동일 반, 동일 번호 학생 찾기
+      if (type === 'general_standard') {
+        // [일괄 입력 모드] 1~4지망 데이터 수집
+        const s1 = document.getElementById('form-school-1').value.trim();
+        const s2 = document.getElementById('form-school-2').value.trim();
+        const s3 = document.getElementById('form-school-3').value.trim();
+        const s4 = document.getElementById('form-school-4').value.trim();
+
+        if (s1) newApps.push({ id: Date.now().toString() + '_1', choice: '후기 1지망 (광역)', schoolType: type, schoolName: s1, status: 'pending' });
+        if (s2) newApps.push({ id: Date.now().toString() + '_2', choice: '후기 2지망 (지역)', schoolType: type, schoolName: s2, status: 'pending' });
+        if (s3) newApps.push({ id: Date.now().toString() + '_3', choice: '후기 3지망 (광역)', schoolType: type, schoolName: s3, status: 'pending' });
+        if (s4) newApps.push({ id: Date.now().toString() + '_4', choice: '후기 4지망 (지역)', schoolType: type, schoolName: s4, status: 'pending' });
+      } else {
+        // [단일 입력 모드]
+        const choice = document.getElementById('form-choice').value;
+        const school = document.getElementById('form-school').value.trim();
+        newApps.push({ id: Date.now().toString(), choice: choice, schoolType: type, schoolName: school, status: 'pending' });
+      }
+
       const existingIdx = allStudents.findIndex(s => s.num === num && s.className === currentClass);
       
       if (existingIdx > -1) {
         allStudents[existingIdx].name = name;
         if(score !== '') allStudents[existingIdx].score = score;
         if(note !== '') allStudents[existingIdx].note = note;
-        allStudents[existingIdx].applications.push(newApp);
+        // 기존 학생 정보가 있으면 지망 목록에 추가로 싹 밀어넣습니다.
+        allStudents[existingIdx].applications.push(...newApps);
       } else {
-        // 새 학생 생성
         allStudents.push({
           id: 's' + Date.now().toString(),
           className: currentClass,
@@ -420,82 +463,76 @@
           name: name,
           score: score,
           note: note,
-          applications: [newApp]
+          applications: newApps
         });
       }
 
+      // 입력 완료 후 모든 입력칸 깨끗하게 초기화
       document.getElementById('form-num').value = '';
       document.getElementById('form-name').value = '';
       document.getElementById('form-score').value = '';
       document.getElementById('form-note').value = '';
       document.getElementById('form-school').value = '';
+      document.getElementById('form-school-1').value = '';
+      document.getElementById('form-school-2').value = '';
+      document.getElementById('form-school-3').value = '';
+      document.getElementById('form-school-4').value = '';
+      
+      // 곧바로 다음 학생의 번호를 입력할 수 있도록 커서를 이동시켜줍니다. (속도 향상!)
+      document.getElementById('form-num').focus();
       
       saveDataAndRender();
     });
 
-    // 3. 접수 상태 변경
     function toggleStatus(studentId, appIdToToggle) {
       const studentIdx = allStudents.findIndex(s => s.id === studentId);
       if (studentIdx === -1) return;
-      
       const appIdx = allStudents[studentIdx].applications.findIndex(a => a.id === appIdToToggle);
       if (appIdx === -1) return;
 
       const currentStatus = allStudents[studentIdx].applications[appIdx].status;
       allStudents[studentIdx].applications[appIdx].status = currentStatus === 'pending' ? 'completed' : 'pending';
-      
       saveDataAndRender();
     }
 
-    // 4. 삭제 확인 모달 열기
     function requestDelete(studentId, appId) {
       deleteTarget = { studentId, appId };
       document.getElementById('delete-modal').classList.remove('hidden-modal');
     }
 
-    // 5. 모달 닫기
     function closeModal() {
       document.getElementById('delete-modal').classList.add('hidden-modal');
       deleteTarget = { studentId: null, appId: null };
     }
 
-    // 6. 삭제 확정
     function confirmDelete() {
       const { studentId, appId } = deleteTarget;
       const studentIdx = allStudents.findIndex(s => s.id === studentId);
       if (studentIdx === -1) return;
 
       allStudents[studentIdx].applications = allStudents[studentIdx].applications.filter(a => a.id !== appId);
-      
-      if (allStudents[studentIdx].applications.length === 0) {
-        allStudents.splice(studentIdx, 1);
-      }
+      if (allStudents[studentIdx].applications.length === 0) allStudents.splice(studentIdx, 1);
 
       closeModal();
       saveDataAndRender();
     }
 
-    // 7. 반 초기화 (수정) 기능 - 팝업 없이 즉시 전환
     document.getElementById('btn-reset-class').addEventListener('click', function() {
       currentClass = '';
       localStorage.removeItem('hwamyeong_current_class_2027');
       checkStateAndRenderScreen();
     });
 
-    // 지망 순서 정렬을 위한 헬퍼 함수
     function getChoiceOrder(choiceText) {
       const orderMap = {
-        '전기 1지망': 1, '전기 2지망': 2, '전기 3지망': 3, '전기 4지망': 4,
+        '전기 지원': 1, '후기 자사고/특목고 등': 2,
         '후기 1지망 (광역)': 5, '후기 2지망 (지역)': 6, '후기 3지망 (광역)': 7, '후기 4지망 (지역)': 8
       };
       return orderMap[choiceText] || 99;
     }
 
-    // --- UI 렌더링 헬퍼 ---
     function renderStudents() {
       const tbody = document.getElementById('student-list-body');
-      
-      // 현재 반 학생들만 필터링 후 번호순 정렬
       const myClassStudents = allStudents
         .filter(s => s.className === currentClass)
         .sort((a, b) => parseInt(a.num) - parseInt(b.num));
